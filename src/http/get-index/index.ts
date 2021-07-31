@@ -1,3 +1,5 @@
+import puppeteer from "https://deno.land/x/puppeteer@9.0.1/mod.ts";
+// const puppeteer = require('puppeteer')
 // TODO: modify the body object!
 let body = `
 <!doctype html>
@@ -22,15 +24,27 @@ let body = `
   </body>
 </html>
 `
-
+async function html_to_pdf(html){
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage()
+  // We set the page content as the generated html by handlebars
+  await page.setContent(html)
+  // We use pdf function to generate the pdf in the same folder as this file.
+  const pdf = await page.pdf({ format: 'A4' ,printBackground:true,margin:false})
+  console.log(pdf)
+  await browser.close();
+  return pdf
+}
 export async function handler (req: object) {
+  const pdf = html_to_pdf('<h1>ded</h1>')
   return {
+
     statusCode: 200,
     headers: {
-      'content-type': 'text/html; charset=utf8',
+      'content-type': 'application/pdf',
       'cache-control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
     },
-    body
+    body:pdf
   }
 }
 
